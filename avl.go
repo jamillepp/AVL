@@ -4,22 +4,28 @@ import (
 	"fmt"
 )
 
-type Node struct {
+type node struct {
 	value   int
-	child   [2]*Node
+	child   [2]*node
 	height  [2]int
 	balance int
-	parent  *Node
+	parent  *node
 }
 
-type Tree interface {
+type tree interface {
 	Search()
 	Insert()
 	Print()
 	Delete()
 }
 
-func (tree *Node) Search(v int) *Node {
+func newAVL() node {
+	return node{
+		value: -1,
+	}
+}
+
+func (tree *node) Search(v int) *node {
 	if tree.value == -1 {
 		fmt.Println("tree its <nil>")
 		return nil
@@ -39,14 +45,14 @@ func (tree *Node) Search(v int) *Node {
 	}
 }
 
-func (tree *Node) Insert(v int) {
+func (tree *node) Insert(v int) {
 	if tree.value == -1 {
 		tree.value = v
 		fmt.Printf("Value %v its now the root\n", v)
 	} else {
 		side := compare(v, tree.value)
 		if tree.child[side] == nil {
-			tree.child[side] = &Node{
+			tree.child[side] = &node{
 				value:  v,
 				parent: tree,
 			}
@@ -74,7 +80,7 @@ func compare(value, nodeValue int) int {
 	}
 }
 
-func (tree *Node) setHeight(side int, op string) {
+func (tree *node) setHeight(side int, op string) {
 	if op == "I" {
 		tree.height[side] += 1
 	} else {
@@ -86,7 +92,7 @@ func (tree *Node) setHeight(side int, op string) {
 	}
 }
 
-func (tree *Node) verifyBalance() {
+func (tree *node) verifyBalance() {
 	tree.balance = tree.height[1] - tree.height[0]
 	if tree.balance > 1 || tree.balance < -1 {
 		if tree.parent != nil {
@@ -120,7 +126,7 @@ func (tree *Node) verifyBalance() {
 	}
 }
 
-func (tree *Node) rightRotation() {
+func (tree *node) rightRotation() {
 	z := *tree
 	*tree = *(tree.child[0])
 	tree.parent = z.parent
@@ -141,7 +147,7 @@ func (tree *Node) rightRotation() {
 	}
 }
 
-func (tree *Node) leftRotation() {
+func (tree *node) leftRotation() {
 	z := *tree
 	*tree = *(tree.child[1])
 	tree.parent = z.parent
@@ -162,7 +168,7 @@ func (tree *Node) leftRotation() {
 	}
 }
 
-func (tree *Node) Delete(v int) bool {
+func (tree *node) Delete(v int) bool {
 	if tree.value == -1 {
 		fmt.Println("tree its <nil>")
 		return false
@@ -172,7 +178,7 @@ func (tree *Node) Delete(v int) bool {
 	if tree.value == v {
 		if tree.itsaLeaf() {
 			tree.value = -1
-			tree.child = [2]*Node{nil, nil}
+			tree.child = [2]*node{nil, nil}
 			tree.parent = nil
 		} else if tree.hasOneChild() {
 			if tree.child[0] != nil {
@@ -242,7 +248,7 @@ func (tree *Node) Delete(v int) bool {
 	return false
 }
 
-func (tree *Node) itsaLeaf() bool {
+func (tree *node) itsaLeaf() bool {
 	if tree.child[0] == nil && tree.child[1] == nil {
 		return true
 	} else {
@@ -250,7 +256,7 @@ func (tree *Node) itsaLeaf() bool {
 	}
 }
 
-func (tree *Node) hasOneChild() bool {
+func (tree *node) hasOneChild() bool {
 	if tree.child[0] != nil && tree.child[1] == nil {
 		return true
 	} else if tree.child[0] == nil && tree.child[1] != nil {
@@ -260,7 +266,7 @@ func (tree *Node) hasOneChild() bool {
 	}
 }
 
-func (tree *Node) hasTwoChilds() bool {
+func (tree *node) hasTwoChilds() bool {
 	if tree.child[0] != nil && tree.child[1] != nil {
 		return true
 	} else {
@@ -268,7 +274,7 @@ func (tree *Node) hasTwoChilds() bool {
 	}
 }
 
-func (tree *Node) inorderSuccessor(successor *Node) *Node {
+func (tree *node) inorderSuccessor(successor *node) *node {
 	if successor == nil {
 		successor = tree
 		if tree.child[1].itsaLeaf() {
@@ -295,7 +301,7 @@ func (tree *Node) inorderSuccessor(successor *Node) *Node {
 	}
 }
 
-func (tree *Node) Print() {
+func (tree *node) Print() {
 	fmt.Printf("{%v ", tree.value)
 	if tree.child[0] != nil {
 		fmt.Printf("[%v, ", tree.child[0].value)
