@@ -12,14 +12,7 @@ type node struct {
 	parent  *node
 }
 
-type tree interface {
-	Search()
-	Insert()
-	Print()
-	Delete()
-}
-
-func newAVL() node {
+func NewAVL() node {
 	return node{
 		value: -1,
 	}
